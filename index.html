@@ -25,99 +25,105 @@
             </div>
         </div>
     </div>
-    <div class="mt-4 d-flex justify-content-center">
-        <div class="d-flex flex-column rounded-3 bg p-4 m-3">
-            <p class="h2 mb-3">Wallet</p>
-            <div class="d-flex mb-3">
-                <div class="input-group d-flex flex-nowrap">            
-                    <span class="input-group-text" id="usymbol">@</span>
-                    <input type="text" class="input" id="username" placeholder="Enter Username">
+    <div id="mbody" class="mt-4 d-flex justify-content-center">
+        <div class="d-flex flex-column rounded-3 bg p-0 m-3 card w-25">
+            <div class="m-4">
+                <p class="h2 mb-3">Wallet</p>
+                <div class="d-flex mb-3">
+                    <div class="input-group d-flex flex-nowrap">            
+                        <span class="input-group-text" id="usymbol">@</span>
+                        <input type="text" class="input form-control" id="username" placeholder="Username">
+                        <button type="button" id="checkbalance" class="btn btn-danger ms-2 rounded-pill">Load</button>
+                    </div>
                 </div>
-                <button type="button" id="checkbalance" class="btn btn-danger ms-2 rounded-pill">Load</button>
-            </div>
-            <div class="d-flex flex-column mb-3">
-                <p class="m-0"><span id="hive">0</span> HIVE</p>
-                <p class="m-0"><span id="swaphive">0</span> SWAP.HIVE</p>
-                <p class="m-0"><span id="vault">0</span> VAULT</p>
-            </div>
-            <div class="d-flex flex-column">
-                <p class="h4 text-info">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 19 19">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
-                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
-                    </svg>
-                    <span>Fee Info</span>
-                </p>
-                <p class="m-0 text-secondary">0.1% Fee for HIVE</p>
-                <p class="m-0 text-secondary">0.1% Fee for SWAP.HIVE</p>
-                <p class="m-0 text-secondary">0% Fee for VAULT</p>
-            </div>
-        </div>
-
-        <div class="d-flex flex-column rounded-3 bg p-4 m-3 flex-grow-1 w-100">
-            <p class="h2 mb-3">Conversion</p>
-            <div class="d-flex">
-                <input type="number" class="input flex-grow-1 a" id="inputquantity" placeholder="Send">
-                <select id="input" class="form-select form-select-lg input b">
-                    <option value="HIVE">HIVE</option>
-                    <option value="SWAP.HIVE">SWAP.HIVE</option>
-                    <option value="VAULT">VAULT</option>
-                </select>
-            </div>
-            <div class="d-flex justify-content-center m-3">
-                <button type="button" id="reverse" class="btn text-light rounded-pill pointer">
-                    <svg width="35" height="35" fill="currentColor" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"></path>
-                    </svg>
-                </button>
-            </div>
-            <div class="d-flex">
-                <input type="number" class="input flex-grow-1 a" id="outputquantity" placeholder="Receive" readonly>
-                <select id="output" class="form-select form-select-lg input b">
-                    <option value="HIVE">HIVE</option>
-                    <option value="SWAP.HIVE" selected>SWAP.HIVE</option>
-                </select>
-            </div>
-            <p class="mt-2 text-secondary">Conversion Fee: <span id="fee" class="text-info">0</span>&nbsp;<span id="feeticker" class="text-info">HIVE</span></p>
-            <button type="button" id="swap" class="btn btn-danger rounded-pill mb-3" disabled>SWAP</button>
-            <div class="d-flex align-items-center">
-                <div id="loading" class="d-none spinner-border text-danger"></div>
-                <span id="status" class="ms-3"></span>
-            </div>
-        </div>
-
-        <div class="d-flex flex-column rounded-3 bg p-4 m-3">
-            <p class="h2 mb-3">Available Liquidity</p>
-            <div class="d-flex align-items-center mb-2">
-                <p class="h4 text-secondary m-0">@hiveupme</p>
-                <button type="button" id="refresh" class="btn-sm btn-info ms-2 rounded-pill">Refresh</button>
-            </div>
-            <div class="d-flex flex-column mb-3">
-                <p class="h4 text-info"><span id="hiveliquidity">0</span> HIVE</p>
-                <p class="h4 text-info"><span id="swaphiveliquidity">0</span> SWAP.HIVE</p>                
-            </div>
-            <div>
-                <p class="h5">Provide Liquidity and Earn Rewards!</p>
-                <p class="text-secondary">You can provide 15% Liquidity on the lower side of the bridge to earn 0.075% intant rewards and free swaps!</p>
-                <a href="https://peakd.com/swap/@hiveupme/hiveupme-swap-script-simple-ui-solution" target="_blank" class="link-info">Learn How to Use</a>
-                <div class="mt-3">
-                    <a href="https://discord.com/invite/XYMrvyr" target="_blank" class="link-light m-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z"></path>
+                <div class="d-flex flex-column mb-3">
+                    <p class="m-0"><span id="hive">0</span> HIVE</p>
+                    <p class="m-0"><span id="swaphive">0</span> SWAP.HIVE</p>
+                    <p class="m-0"><span id="vault">0</span> VAULT</p>
+                </div>
+                <div class="d-flex flex-column">
+                    <p class="h4 text-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 19 19">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"></path>
+                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"></path>
                         </svg>
-                    </a>
-                    <a href="https://peakd.com/@hiveupme/posts" target="_blank" class="link-light m-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 220 190">
-                            <defs><style>.cls-1{fill:#ffff;}</style></defs>
-                            <title>hive-hive-logo</title>
-                            <g id="Layer_2" data-name="Layer 2">
-                                <g id="Layer_1-2" data-name="Layer 1">
-                                    <path class="cls-1" d="M157.27,107.26a1,1,0,0,1,.82,1.42l-46.75,80.85a1,1,0,0,1-.82.47H81.94a.94.94,0,0,1-.81-1.42l46.75-80.85a.94.94,0,0,1,.81-.47ZM129.48,84.09a1,1,0,0,1-.82-.47L81.13,1.42A.94.94,0,0,1,81.94,0h28.58a1,1,0,0,1,.82.47l47.53,82.2a.94.94,0,0,1-.81,1.42Z"/>
-                                    <path class="cls-1" d="M135.13,1.42A.94.94,0,0,1,136,0h28.62a.93.93,0,0,1,.81.47l54.49,94.06a.93.93,0,0,1,0,.94l-54.49,94.06a.93.93,0,0,1-.81.47H136a.94.94,0,0,1-.82-1.42L189.34,95Zm-23.26,93.1a1,1,0,0,1,0,1L57.13,189.53a1,1,0,0,1-1.65,0L.13,95.48a1,1,0,0,1,0-1L54.87.47a1,1,0,0,1,1.65,0Z"/>
+                        <span>Fee Info</span>
+                    </p>
+                    <p class="m-0 text-secondary">0.1% Fee for HIVE</p>
+                    <p class="m-0 text-secondary">0.1% Fee for SWAP.HIVE</p>
+                    <p class="m-0 text-secondary">0% Fee for VAULT</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column rounded-3 bg p-0 m-3 flex-grow-1 card w-50">
+            <div class="m-4">
+                <p class="h2 mb-3">Conversion</p>
+                <div class="d-flex">
+                    <input type="number" class="input form-control a" id="inputquantity" placeholder="Send">
+                    <select id="input" class="form-select form-select-lg input b" style="width: initial;">
+                        <option value="HIVE">HIVE</option>
+                        <option value="SWAP.HIVE">SWAP.HIVE</option>
+                        <option value="VAULT">VAULT</option>
+                    </select>
+                </div>
+                <div class="d-flex justify-content-center m-3">
+                    <button type="button" id="reverse" class="btn text-light rounded-pill pointer">
+                        <svg width="35" height="35" fill="currentColor" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div class="d-flex">
+                    <input type="number" class="input form-control a" id="outputquantity" placeholder="Receive" readonly>
+                    <select id="output" class="form-select form-select-lg input b" style="width: initial;">
+                        <option value="HIVE">HIVE</option>
+                        <option value="SWAP.HIVE" selected>SWAP.HIVE</option>
+                    </select>
+                </div>
+                <p class="mt-2 text-secondary">Conversion Fee: <span id="fee" class="text-info">0</span>&nbsp;<span id="feeticker" class="text-info">HIVE</span></p>
+                <button type="button" id="swap" class="btn btn-danger rounded-pill mb-3 w-100" disabled>SWAP</button>
+                <div class="d-flex align-items-center">
+                    <div id="loading" class="d-none spinner-border text-danger"></div>
+                    <span id="status" class="ms-3"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column rounded-3 bg p-0 m-3 card w-25">
+            <div class="m-4">
+                <p class="h2 mb-3">Available Liquidity</p>
+                <div class="d-flex align-items-center mb-2">
+                    <p class="h4 text-secondary m-0">@hiveupme</p>
+                    <button type="button" id="refresh" class="btn-sm btn-info ms-2 rounded-pill">Refresh</button>
+                </div>
+                <div class="d-flex flex-column mb-3">
+                    <p class="h4 text-info"><span id="hiveliquidity">0</span> HIVE</p>
+                    <p class="h4 text-info"><span id="swaphiveliquidity">0</span> SWAP.HIVE</p>                
+                </div>
+                <div>
+                    <p class="h5">Provide Liquidity and Earn Rewards!</p>
+                    <p class="text-secondary">You can provide 15% Liquidity on the lower side of the bridge to earn 0.075% intant rewards and free swaps!</p>
+                    <a href="https://peakd.com/swap/@hiveupme/hiveupme-swap-script-simple-ui-solution" target="_blank" class="link-info">Learn How to Use</a>
+                    <div class="mt-3">
+                        <a href="https://discord.com/invite/XYMrvyr" target="_blank" class="link-light m-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z"></path>
+                            </svg>
+                        </a>
+                        <a href="https://peakd.com/@hiveupme/posts" target="_blank" class="link-light m-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 220 190">
+                                <defs><style>.cls-1{fill:#ffff;}</style></defs>
+                                <title>hive-hive-logo</title>
+                                <g id="Layer_2" data-name="Layer 2">
+                                    <g id="Layer_1-2" data-name="Layer 1">
+                                        <path class="cls-1" d="M157.27,107.26a1,1,0,0,1,.82,1.42l-46.75,80.85a1,1,0,0,1-.82.47H81.94a.94.94,0,0,1-.81-1.42l46.75-80.85a.94.94,0,0,1,.81-.47ZM129.48,84.09a1,1,0,0,1-.82-.47L81.13,1.42A.94.94,0,0,1,81.94,0h28.58a1,1,0,0,1,.82.47l47.53,82.2a.94.94,0,0,1-.81,1.42Z"/>
+                                        <path class="cls-1" d="M135.13,1.42A.94.94,0,0,1,136,0h28.62a.93.93,0,0,1,.81.47l54.49,94.06a.93.93,0,0,1,0,.94l-54.49,94.06a.93.93,0,0,1-.81.47H136a.94.94,0,0,1-.82-1.42L189.34,95Zm-23.26,93.1a1,1,0,0,1,0,1L57.13,189.53a1,1,0,0,1-1.65,0L.13,95.48a1,1,0,0,1,0-1L54.87.47a1,1,0,0,1,1.65,0Z"/>
+                                    </g>
                                 </g>
-                            </g>
-                        </svg>
-                    </a>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

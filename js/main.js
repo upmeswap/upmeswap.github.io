@@ -82,7 +82,6 @@ $(window).bind("load", function() {
     $("#swap").click(async function () {
         $("#swap").attr("disabled", "true");
         $("#loading").removeClass("d-none");
-        $("#status").addClass("text-light");
         $("#status").text("Please Wait...");
         await refresh();
         await updateBalance();
