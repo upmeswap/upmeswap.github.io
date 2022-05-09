@@ -20,6 +20,14 @@ $(window).bind("load", function() {
         bridgebal = await getBalances("hiveupme");
         $("#hiveliquidity").text(bridgebal.HIVE.toFixed(3));
         $("#swaphiveliquidity").text(bridgebal["SWAP.HIVE"].toFixed(3));
+
+        const total = bridgebal.HIVE + bridgebal["SWAP.HIVE"];
+        const stablereq = total * 0.15;
+        if (bridgebal.HIVE < stablereq)
+        $("#reqhive").text((stablereq - bridgebal.HIVE).toFixed(3));
+
+        if (bridgebal["SWAP.HIVE"] < stablereq)
+        $("#reqswaphive").text((stablereq - bridgebal["SWAP.HIVE"]).toFixed(3));
     };
 
     $("#refresh").click(async function () {
