@@ -35,7 +35,7 @@ $(window).bind("load", function() {
         const fee = (insymbol === "VAULT") ? 0 : val * 0.001;
         $("#fee").text(fee.toFixed(3));
         $("#feeticker").text(insymbol);
-        const output = (val - fee);
+        const output = (insymbol === "VAULT") ? (val/10) : (val - fee);
         $("#outputquantity").val(output.toFixed(3));
 
         if (bridgebal[outsymbol] >= output
