@@ -102,7 +102,7 @@ $(window).bind("load", function() {
     }
 
     $("#checkbalance").click(async function() {
-        user = $("#username").val();
+        user = $.trim($("#username").val().toLowerCase());
         if (user.length >= 3) {
             $(this).attr("disabled", "true");
             await updateBalance();
