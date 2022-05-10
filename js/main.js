@@ -2,6 +2,10 @@ $(window).bind("load", function() {
     const ssc = new SSC("https://ha.herpc.dtools.dev");
     var user = null, bal = { HIVE: 0, "SWAP.HIVE": 0, VAULT: 0 }, bridgebal;
 
+    function dec(val) {
+        return Math.floor(val * 1000) / 1000;
+    }
+
     async function getBalances (account) {
         const res = await hive.api.getAccountsAsync([account]);
         if (res.length > 0) {
@@ -9,9 +13,9 @@ $(window).bind("load", function() {
             var swaphive = res2.find(el => el.symbol === "SWAP.HIVE");
             var vault = res2.find(el => el.symbol === "VAULT");
             return {
-                HIVE: parseFloat(res[0].balance.split(" ")[0]),
-                "SWAP.HIVE": parseFloat((swaphive) ? swaphive.balance : 0),
-                VAULT: parseFloat((vault) ? vault.balance : 0)
+                HIVE: dec(parseFloat(res[0].balance.split(" ")[0])),
+                "SWAP.HIVE": dec(parseFloat((swaphive) ? swaphive.balance : 0)),
+                VAULT: dec(parseFloat((vault) ? vault.balance : 0))
             }
         } else return { HIVE: 0, "SWAP.HIVE": 0, VAULT: 0 };
     }
@@ -37,27 +41,47 @@ $(window).bind("load", function() {
     });
 
     function updateSwap(r) {
-        const insymbol = $("#input").val();
-        const outsymbol = $("#output").val();
-        const val = $("#inputquantity").val();
-        const fee = (insymbol === "VAULT") ? 0 : val * 0.001;
-        $("#fee").text(fee.toFixed(3));
-        $("#feeticker").text(insymbol);
-        const output = (insymbol === "VAULT") ? (val/10) : (val - fee);
-        $("#outputquantity").val(output.toFixed(3));
+        try {
+            const insymbol = $("#input").val();
+            var outsymbol = $("#output").val();
+            const val = $("#inputquantity").val();
+            const fee = (insymbol === "VAULT") ? 0 : Math.ceil((val * 0.001) * 1000) / 1000;
+            $("#fee").text(fee.toFixed(3));
+            $("#feeticker").text(insymbol);
+            const output = (insymbol === "VAULT") ? (val/10) : (val - fee);
+            $("#outputquantity").val(output.toFixed(3));
 
-        if (bridgebal[outsymbol] >= output
-            && bal[insymbol] >= val
-            && insymbol !== outsymbol
-            && val >= 1) {
-            $("#swap").removeAttr("disabled");
-            if (r) r(true, parseFloat(val).toFixed(3), insymbol, `Swapping to ${(outsymbol === 'SWAP.HIVE') ? 'Swap.Hive' : 'Hive'}`);
+            if (insymbol === outsymbol) {
+                var othersymbol;
+                $("#output option").each(function () {
+                    if ($(this).val() !== insymbol) {
+                        othersymbol =  $(this).val();
+                        return
+                    }
+                });
+                outsymbol = othersymbol;
+                $("#output").val(othersymbol);
+            }
 
-        } else { 
-            $("#swap").attr("disabled", "true");
-            if (r) r(false);
-        }
+            if (bridgebal[outsymbol] >= output
+                && bal[insymbol] >= val
+                && insymbol !== outsymbol
+                && val >= 1) {
+                $("#swap").removeAttr("disabled");
+                if (r) r(true, parseFloat(val).toFixed(3), insymbol, `Swapping to ${(outsymbol === 'SWAP.HIVE') ? 'Swap.Hive' : 'Hive'}`);
+
+            } else { 
+                $("#swap").attr("disabled", "true");
+                if (r) r(false);
+            }
+        } catch (e) {}
     }
+
+    $(".s").click(function () {
+        $("#input").val($(this).find(".sym").text());
+        $("#inputquantity").val($(this).find(".qt").text());
+        updateSwap();
+    });
 
     $("#inputquantity").keyup(() => { updateSwap(); });
     $("#input, #output").change(() => { updateSwap(); });
@@ -84,8 +108,15 @@ $(window).bind("load", function() {
             await updateBalance();
             updateSwap();
             $(this).removeAttr("disabled");
+            localStorage['user'] = user;
         }
     });
+
+    if (localStorage['user']) {
+        $("#username").val(localStorage['user']);
+        user = localStorage['user'];
+        updateBalance();
+    }
 
     $("#swap").click(async function () {
         $("#swap").attr("disabled", "true");
