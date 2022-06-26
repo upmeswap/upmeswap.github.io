@@ -32,6 +32,20 @@ $(window).bind("load", function() {
 
         if (bridgebal["SWAP.HIVE"] < stablereq)
         $("#reqswaphive").text((stablereq - bridgebal["SWAP.HIVE"]).toFixed(3));
+
+        try {
+            if (hive_keychain) {
+                $("#txtype").removeAttr("disabled");
+                $("#txtype").attr("checked", true);
+            }
+        }
+        catch(e) {
+            $("#txtype").attr("disabled", true);
+            $("#txtype").removeAttr("checked");
+        }
+
+        $("input[name=txtype]").change();
+
     };
 
     $("#refresh").click(async function () {
@@ -77,6 +91,11 @@ $(window).bind("load", function() {
         } catch (e) {}
     }
 
+    var modal = new bootstrap.Modal(document.getElementById('authqr'), {
+        focus: true,
+        backdrop: 'static',
+    });
+
     $(".s").click(function () {
         $("#input").val($(this).find(".sym").text());
         $("#inputquantity").val($(this).find(".qt").text());
@@ -118,6 +137,43 @@ $(window).bind("load", function() {
         updateBalance();
     }
 
+    // HAS implementation
+    const HAS_SERVER = "wss://hive-auth.arcange.eu";
+    const HAS_APP_DATA = {
+        name:"UPMESWAP",
+        description:"Discounted Bridge",
+        icon:"https://upmeswap.github.io/assets/hiveupme.png",
+    };
+    const app_key = uuidv4();
+    var token
+    var expire
+    var auth_key
+    var ws = undefined;
+    if ("WebSocket" in window) {
+        $("#txtype1").removeAttr("disabled");
+        if ($("#txtype").attr("checked") !== "true") {
+            $("#txtype").removeAttr("checked");
+            $("#txtype1").attr("checked", true);
+        }
+        $("input[name=txtype]").change();
+        ws = new WebSocket(HAS_SERVER)
+        ws.onopen = function() {
+            console.log("Connection Established");
+            // Web Socket is connected
+        }        
+    } else {
+        $("#txtype1").attr("disabled", true);
+        $("#txtype1").removeAttr("checked");
+    }
+
+    function isTimeAvailable(ex) {
+        const timestamp = new Date().getTime();
+        if (ex > timestamp)
+            return true;
+        else 
+            return false;
+    }
+
     $("#swap").click(async function () {
         $("#swap").attr("disabled", "true");
         $("#loading").removeClass("d-none");
@@ -126,53 +182,221 @@ $(window).bind("load", function() {
         await updateBalance();
         updateSwap(function(canSwap, amount, currency, memo) {
             if (canSwap) {
+                const txtype = $("input[type='radio'][name='txtype']:checked").val();
+                
                 $("#swap").attr("disabled", "true");
                 $("#loading").addClass("d-none");
-                $("#status").text("Confirm the transaction through Hive Keychain.");
-                if (currency !== "HIVE") {
-                    hive_keychain.requestSendToken(
-                        user,
-                        "hiveupme",
-                        amount,
-                        memo,
-                        currency,
-                        async function (res) {
-                            if (res.success === true) {
-                                $("#status").text("Swaping Done Successfully!");
-                                $("#status").addClass("text-success");
-                                await updateBalance();
-                                updateSwap();
-                            } else {
-                                $("#status").text("Transaction failed, Please try again.");
-                                updateSwap();
+                $("#status").text(`Confirm the transaction through ${txtype}.`);
+
+                if (txtype === "Hive Keychain") {
+                    if (currency !== "HIVE") {
+                        hive_keychain.requestSendToken(
+                            user,
+                            "hiveupme",
+                            amount,
+                            memo,
+                            currency,
+                            async function (res) {
+                                if (res.success === true) {
+                                    $("#status").text("Swaping Done Successfully!");
+                                    $("#status").addClass("text-success");
+                                    await updateBalance();
+                                    updateSwap();
+                                } else {
+                                    $("#status").text("Transaction failed, Please try again.");
+                                    updateSwap();
+                                }
+                                console.log(res);
                             }
-                            console.log(res);
+                        );
+                    } else {
+                        hive_keychain.requestTransfer(
+                            user,
+                            "hiveupme",
+                            amount,
+                            memo,
+                            currency,
+                            async function (res) {
+                                if (res.success === true) {
+                                    $("#status").text("Swaping Done Successfully!");
+                                    $("#status").addClass("text-success");
+                                    await updateBalance();
+                                    updateSwap();
+                                } else {
+                                    $("#status").text("Transaction failed, Please try again.");
+                                    updateSwap();
+                                }
+                                console.log(res);
+                            }
+                        );
+                    }
+                } else if (txtype === "Hive Auth") {
+                    ws.onmessage = function (event) {
+                        const message = typeof(event.data)=="string" ? JSON.parse(event.data) : event.data;
+                        if(message.cmd) {
+                            switch(message.cmd) {
+                                case "auth_wait":
+                                    // Update QRCode
+                                    const json = JSON.stringify({
+                                        account: user, 
+                                        uuid: message.uuid,
+                                        key: auth_key,
+                                        host: HAS_SERVER});
+            
+                                    const URI =  `has://auth_req/${btoa(json)}`
+                                    var url = "https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=" + URI;
+                                    $("#qr-code").attr("src", url);
+                                    $("#qr-link").attr("href", URI);
+                                    $("#qr-div").addClass("d-flex");
+                                    $("#qr-div").removeClass("d-none");
+                                    $("#approve-div").addClass("d-none");
+                                    $("#approve-div").removeClass("d-flex");  
+
+                                    modal.show();
+                                    break
+                                case "auth_ack":
+                                    try {
+                                        // Try to decrypt and parse payload data
+                                        message.data = JSON.parse(CryptoJS.AES.decrypt(message.data, auth_key).toString(CryptoJS.enc.Utf8))
+                                        token = message.data.token
+                                        expire = message.data.expire
+                                        localStorage['token'] = token;
+                                        localStorage['expire'] = expire;
+                                        localStorage['auth_key'] = auth_key;
+
+                                        $("#qr-div").removeClass("d-flex");
+                                        $("#qr-div").addClass("d-none");
+                                        $("#approve-div").addClass("d-flex");
+                                        $("#approve-div").removeClass("d-none");
+                                        modal.show();
+
+                                        $("#approve").click(function() {
+                                            modal.hide();
+                                            const json = JSON.stringify({
+                                                "contractName": "tokens",
+                                                "contractAction": "transfer",
+                                                "contractPayload": {
+                                                    "symbol": currency,
+                                                    "to": "hiveupme",
+                                                    "quantity": amount,
+                                                    "memo": memo
+                                                }
+                                            });                       
+                                            if (currency !== "HIVE") {
+                                                const op = [
+                                                    "custom_json",
+                                                    {
+                                                        id: "ssc-mainnet-hive",
+                                                        json: json,
+                                                        required_auths: [user],
+                                                        required_posting_auths: [],
+                                                    }
+                                                ]
+                                                const sign_data = {
+                                                    key_type: "active",
+                                                    ops: [op],
+                                                    broadcast: true
+                                                };
+                                                const data = CryptoJS.AES.encrypt(JSON.stringify(sign_data),auth_key).toString();
+                                                const payload = { cmd:"sign_req", account:user, token:token, data:data };
+                                                ws.send(JSON.stringify(payload));
+                                            } else {
+                                                const op = [
+                                                    "transfer",
+                                                    {
+                                                        from: user,
+                                                        to: 'hiveupme',
+                                                        amount: `${amount} HIVE`,
+                                                        memo,
+                                                    }
+                                                ]
+                                                const sign_data = {
+                                                    key_type: "active",
+                                                    ops: [op],
+                                                    broadcast: true
+                                                };
+                                                const data = CryptoJS.AES.encrypt(JSON.stringify(sign_data),auth_key).toString();
+                                                const payload = { cmd:"sign_req", account:user, token:token, data:data };
+                                                ws.send(JSON.stringify(payload));
+                                            }
+                                        });                                 
+                                    } catch(e) {
+                                        // Decryption failed - ignore message
+                                        modal.hide();
+                                        console.error("decryption failed",e.message)
+                                        $("#loading").addClass("d-none");
+                                        $("#status").text("Failed to Establish connection with HAS. Try Again!");
+                                        updateSwap();
+                                    }
+                                    break
+                                case "auth_nack":
+                                    modal.hide();
+                                    $("#loading").addClass("d-none");
+                                    $("#status").text("Failed to Establish connection with HAS. Try Again!");
+                                    updateSwap();
+                                    break;
+                                case "sign_wait":
+                                    $("#loading").removeClass("d-none");
+                                    $("#status").text("Waiting for approval from Hive Auth App.");
+                                    break
+                                case "sign_ack":
+                                    $("#loading").addClass("d-none");
+                                    $("#status").text("Swaping Done Successfully!");
+                                    $("#status").addClass("text-success");
+                                    updateSwap();
+                                    break
+                                case "sign_nack":
+                                    $("#loading").addClass("d-none");
+                                    $("#status").text("Transaction was declined through HiveAuth.");
+                                    updateSwap();
+                                    break
+                                case "sign_err":
+                                    $("#loading").addClass("d-none");
+                                    $("#status").text("Transaction was unsuccessfull through HiveAuth.");
+                                    updateSwap();
+                                    break
+                            }
                         }
-                    );
+                    }
+
+                    const auth_data = {
+                        app: HAS_APP_DATA,
+                        token: undefined,
+                        challenge: undefined
+                    };
+
+                    auth_key = uuidv4();
+
+                    if (localStorage['token']
+                        && localStorage['auth_key']
+                        && isTimeAvailable(localStorage['expire'])) {
+                        token = localStorage['token'];
+                        auth_key = localStorage['auth_key'];
+                        auth_data.token = token;
+                    }
+        
+                    const data = CryptoJS.AES.encrypt(JSON.stringify(auth_data),auth_key).toString();
+                    const payload = { cmd:"auth_req", account:user, data:data, token:token};
+                    ws.send(JSON.stringify(payload));
                 } else {
-                    hive_keychain.requestTransfer(
-                        user,
-                        "hiveupme",
-                        amount,
-                        memo,
-                        currency,
-                        async function (res) {
-                            if (res.success === true) {
-                                $("#status").text("Swaping Done Successfully!");
-                                $("#status").addClass("text-success");
-                                await updateBalance();
-                                updateSwap();
-                            } else {
-                                $("#status").text("Transaction failed, Please try again.");
-                                updateSwap();
-                            }
-                            console.log(res);
-                        }
-                    );
+                    $("#loading").addClass("d-none");
+                    $("#status").text("No method of transaction available.");
+                    updateSwap();
                 }
             } else {
                 $("#loading").addClass("d-none");
                 $("#status").text("Balance or Liquidity is changed, Please try again.");
+            }
+        });
+    });
+
+    $("input[name=txtype]").change(function() {
+        const el = $("input[type='radio'][name='txtype']");
+        el.each(function () {
+            if ($(this).prop("checked") == true) {
+                $(this).parent("div").addClass("bg-primary");
+            } else {
+                $(this).parent("div").removeClass("bg-primary");
             }
         });
     });

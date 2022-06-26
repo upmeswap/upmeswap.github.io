@@ -7,9 +7,26 @@ html, body{
     font-size: 1rem;
 }
 
+img {
+    max-width: 270px;
+    max-height: 270px;
+}
+
 #logo {
     width: 70px;
     height: 70px;
+}
+
+.box {
+  padding: 8px;
+  background-color: #1e1e1e;
+}
+
+.ops{
+  width: 25px;
+  height: 25px;
+  margin-left: 8px;
+  margin-right: 5px;
 }
 
 .i {
